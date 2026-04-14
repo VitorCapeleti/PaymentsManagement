@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments Management</title>
+</head>
+<body>
+    <header>
+        <h1>Payments Management</h1>
+    </header>
+    <main>
+        <form action="" method="POST">
+            <label for="archive">Deseja carregar um arquivo?</label>
+            <input type="file" name="archive" id="archive" accept=".csv">
+            <label for="archiveName">Nome do Arquivo: </label>
+            <input type="text" name="archiveName" id="archiveName">
+            <div id="container-itens">
+                <div id="input-group">
+                    <label for="name">Nome do Produto: </label>
+                    <input type="text" name="name" id="name">
+                    <label for="amount">Valor: </label>
+                    <input type="number" name="amount" id="amount">
+                    <label for="date">Data: </label>
+                    <input type="date" name="date" id="date">
+                    <label for="category">Categoria: </label>
+                    <input type="text" name="category" id="category">
+                </div>
+            </div>
+            <button type="button" onclick="addInputs()">Adicionar outro item</button>
+            <button type="submit">Enviar dados</button>
+        </form>
+        <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico Matplotlib">
+    </main>
+    <script>
+        function addInputs() {
+            const container = document.getElementById('container-itens');
+            const newInputGroup = container.firstElementChild.cloneNode(true);
+            newInputGroup.querySelectorAll('input').forEach(input => input.value = '');
+            container.appendChild(newInputGroup);
+        }
+    </script>
+</body>
+</html>
+
+<!-- <table border="1">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.id }}</td>
+                    <td>{{ payment.name }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.date }}</td>
+                    <td>{{ payment.category }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>-->

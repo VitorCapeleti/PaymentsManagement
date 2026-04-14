@@ -10,7 +10,7 @@ class Archive:
     def export_csv_file(self):
         self.pandasData.to_csv(self.name, index=False)
     
-    def load_csv_file(self, path: str):
+    def load_csv_file(self, path):
         self.pandasData = pd.read_csv(path)
     
     def __str__(self):

@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import io
+import base64
 class Graph:
     def __init__(self, name: str, xlabel: str, ylabel: str):
         self.name = name
@@ -14,5 +16,9 @@ class Graph:
         plt.xlabel(self.xlabel, fontsize = 12)
         plt.ylabel(self.ylabel, fontsize = 12)
         plt.tight_layout()
-        return plt.show()
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        plt.close()
+        return base64.b64encode(buf.getvalue()).decode('utf-8')
         
