@@ -20,7 +20,7 @@
                     </div>
                     <div class="form-header-item">
                         <label for="archiveName">Crie um novo Arquivo: </label>
-                        <input type="text" name="archiveName" id="archiveName" placeholder="Digite o nome do arquivo (.csv)">
+                        <input type="text" name="archiveName" id="archiveName" placeholder="Nome do arquivo (.csv)">
                     </div>
                 </div>
                 <div class="header-group">
@@ -32,7 +32,7 @@
                 <div id="container-itens">
                     <div id="input-group">
                         <input type="text" name="name" id="name">
-                        <input type="number" name="amount" id="amount">
+                        <input type="number" step="0.01" name="amount" id="amount">
                         <input type="date" name="date" id="date">
                         <input type="text" name="category" id="category">
                     </div>
@@ -42,7 +42,7 @@
                     <button type="submit">Enviar dados</button>
                 </div>
             </form>
-            <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico Matplotlib">
+            <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico Matplotlib" class="matplot-img">
         </div>
         
     </main>
