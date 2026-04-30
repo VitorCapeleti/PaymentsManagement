@@ -5,7 +5,7 @@ class Archive:
         self.pandasData = pd.DataFrame()
         
     def set_dados(self, dataLine: dict):
-        self.pandasData = pd.concat([self.pandasData, pd.DataFrame([dataLine])], ignore_index=True)
+        self.pandasData = pd.concat([self.pandasData, pd.DataFrame(dataLine)], ignore_index=True)
         
     def export_csv_file(self):
         self.pandasData.to_csv(self.name, index=False)
