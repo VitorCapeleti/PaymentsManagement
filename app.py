@@ -17,6 +17,12 @@ def index():
         else:
             archive = Archive(name=request.form.get('archiveName'))
         data = {}
+        listData = ['name', 'amount', 'date', 'category']
+        for nameData in listData:
+            values = request.form.getlist(nameData)
+            if not values or any(not item.strip() for item in values):
+                message = "Erro, impossível adicionar valores vazios"
+                return render_template('index.html', message=message, graphBase64=None)
         data['Produto'] = request.form.getlist('name')
         data['Valor'] = list(map(float, request.form.getlist('amount')))
         data['Data'] = list(map(lambda h: datetime.strptime(h, "%Y-%m-%d"), request.form.getlist('date') ))
@@ -25,7 +31,7 @@ def index():
         archive.export_csv_file()
         graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
         dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-        graphBase64 = graph.plotLineGraph(dataPayment)
+        graphBase64 = graph.plotPieGraph(dataPayment)
         return render_template('index.html', message=message, graphBase64=graphBase64)
     return render_template('index.html', message=message, graphBase64=None)
 

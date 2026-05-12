@@ -30,12 +30,6 @@
                     <label for="category">Categoria</label>
                 </div>
                 <div id="container-itens">
-                    <div id="input-group">
-                        <input type="text" name="name" id="name">
-                        <input type="number" step="0.01" name="amount" id="amount">
-                        <input type="date" name="date" id="date">
-                        <input type="text" name="category" id="category">
-                    </div>
                 </div>
                 <div class="form-buttons">
                     <button type="button" onclick="addInputs()">Adicionar outro item</button>
@@ -43,13 +37,21 @@
                 </div>
             </form>
             <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico Matplotlib" class="matplot-img">
+            <span>{{ message }}</span>
         </div>
         
     </main>
     <script>
         function addInputs() {
             const container = document.getElementById('container-itens');
-            const newInputGroup = container.firstElementChild.cloneNode(true);
+            const newInputGroup = document.createElement('div');
+            newInputGroup.id = 'input-group';
+            newInputGroup.innerHTML = `
+                <input type="text" name="name" id="name">
+                <input type="number" step="0.01" name="amount" id="amount">
+                <input type="date" name="date" id="date">
+                <input type="text" name="category" id="category">
+            `;
             newInputGroup.querySelectorAll('input').forEach(input => input.value = '');
             container.appendChild(newInputGroup);
         }
