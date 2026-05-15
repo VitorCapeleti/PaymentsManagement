@@ -20,7 +20,8 @@ def index():
         listData = ['name', 'amount', 'date', 'category']
         for nameData in listData:
             values = request.form.getlist(nameData)
-            if not values or any(not item.strip() for item in values):
+            if (not archive.pandasData.empty) & len(values) == 0: continue
+            elif not values or any(not item.strip() for item in values):
                 message = "Erro, impossível adicionar valores vazios"
                 return render_template('index.html', message=message, graphBase64=None)
         data['Produto'] = request.form.getlist('name')
