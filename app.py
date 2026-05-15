@@ -32,7 +32,7 @@ def index():
         archive.export_csv_file()
         graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
         dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-        graphBase64 = graph.plotPieGraph(dataPayment)
+        graphBase64 = graph.plotLineGraph(dataPayment)
         return render_template('index.html', message=message, graphBase64=graphBase64)
     return render_template('index.html', message=message, graphBase64=None)
 
