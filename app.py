@@ -26,13 +26,25 @@ def index():
                 return render_template('index.html', message=message, graphBase64=None)
         data['Produto'] = request.form.getlist('name')
         data['Valor'] = list(map(float, request.form.getlist('amount')))
-        data['Data'] = list(map(lambda h: datetime.strptime(h, "%Y-%m-%d"), request.form.getlist('date') ))
+        data['Data'] = request.form.getlist('date')
         data['Categoria'] = request.form.getlist('category')
         archive.set_dados(data)
+        print(archive.pandasData.dtypes)
         archive.export_csv_file()
+        graphType = request.form.get('graphType')
         graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
         dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-        graphBase64 = graph.plotLineGraph(dataPayment)
+        graphBase64 = None
+        if graphType == 'barH':
+            graphBase64 = graph.plotLineGraph(dataPayment)
+        elif graphType == 'pie':
+            graphBase64 = graph.plotPieGraph(dataPayment)
+        elif graphType == 'line':
+            graph.ylabel = "Valor Gasto"
+            graph.xlabel = "Dias"
+            dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
+            graphBase64 = graph.plotLinePointGraph(dataPayment)
+        
         return render_template('index.html', message=message, graphBase64=graphBase64)
     return render_template('index.html', message=message, graphBase64=None)
 

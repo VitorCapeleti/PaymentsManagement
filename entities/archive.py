@@ -5,7 +5,14 @@ class Archive:
         self.pandasData = pd.DataFrame()
         
     def set_dados(self, dataLine: dict):
-        self.pandasData = pd.concat([self.pandasData, pd.DataFrame(dataLine)], ignore_index=True)
+        new_data = pd.DataFrame(dataLine)
+        new_data['Data'] = pd.to_datetime(new_data['Data'], format='%Y-%m-%d', exact=False)
+        if self.pandasData.empty:
+            self.pandasData = new_data
+        else:
+            self.pandasData = pd.concat([self.pandasData, new_data], ignore_index=True)
+            self.pandasData['Data'] = pd.to_datetime(self.pandasData['Data'], exact=False)
+            self.pandasData['Data'] = self.pandasData['Data'].dt.normalize()
         
     def export_csv_file(self):
         self.pandasData.to_csv(self.name, index=False)
