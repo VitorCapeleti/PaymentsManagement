@@ -44,7 +44,23 @@ def index():
             graph.xlabel = "Dias"
             dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
             graphBase64 = graph.plotLinePointGraph(dataPayment)
+        elif graphType == 'dashboard':
+            return redirect(url_for('dashboard', archiveLoad = archive.name))
         
         return render_template('index.html', message=message, graphBase64=graphBase64)
     return render_template('index.html', message=message, graphBase64=None)
 
+@app.route('/dashboard', methods = ['GET', 'POST'])
+def dashboard():
+    archiveName = request.args.get('archiveLoad')
+    archive = Archive(name=archiveName)
+    archive.load_csv_file(archiveName)
+    graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
+    dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
+    graphBarH = graph.plotLineGraph(dataPayment)
+    graphPie = graph.plotPieGraph(dataPayment)
+    graph.ylabel = "Valor Gasto"
+    graph.xlabel = "Dias"
+    dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
+    graphLine = graph.plotLinePointGraph(dataPayment)
+    return render_template('dashboard.html', graphLine=graphLine, graphBarH=graphBarH, graphPie=graphPie)
