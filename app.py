@@ -61,6 +61,8 @@ def dashboard():
     graphPie = graph.plotPieGraph(dataPayment)
     graph.ylabel = "Valor Gasto"
     graph.xlabel = "Dias"
-    dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
-    graphLine = graph.plotLinePointGraph(dataPayment)
-    return render_template('dashboard.html', graphLine=graphLine, graphBarH=graphBarH, graphPie=graphPie)
+    dataPaymentD = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
+    graphLine = graph.plotLinePointGraph(dataPaymentD)
+    groupedSeries = dataPayment.reset_index()
+    tableHtml = groupedSeries.to_html(classes='table', index=False, header=True)
+    return render_template('dashboard.html', graphLine=graphLine, graphBarH=graphBarH, graphPie=graphPie, infoTable=tableHtml)

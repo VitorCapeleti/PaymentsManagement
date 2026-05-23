@@ -26,7 +26,7 @@ main {
     .container-center{
         display: flex;
         flex-direction: column;
-        background-color: var(--secondary-color);
+        background-color: #ffffff;
         padding: 20px;
         border-radius: 10px;
         .form-header{
@@ -111,6 +111,73 @@ main {
             max-width: 100%;
             height: auto;
             margin-top: 16px;
+        }
+        /*DashBoard*/
+        .dashboard{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 96%;
+            .table {
+                width: auto;
+                border-collapse: collapse;
+                background-color: #ffffff;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                overflow: hidden;
+                border: none;
+            }
+
+            .table th {
+                background-color: var(--primary-color);
+                color: #ffffff;
+                text-align: left;
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .table td {
+                padding: 15px;
+                border-bottom: 1px solid #dddddd;
+                color: #333333;
+            }
+
+            .table tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .table tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+            .left-sec{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+            .middle{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                .matplot-img-dash-middle{
+                    max-width: 90%;
+                }
+            }
+            .right-sec{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+            }
+            .matplot-img-dash{
+                max-width: 56%;
+            }
+            .matplot-img-dash-left{
+                max-width: 80%;
+            }
         }
     }
 }
