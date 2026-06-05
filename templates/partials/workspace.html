@@ -1,0 +1,88 @@
+<div class="flex-1 bg-white border border-gray-300 shadow flex flex-col relative">
+    
+    <div class="absolute top-2 right-2">
+        <form action="/export" method="POST" class="flex items-center gap-1 bg-white border border-gray-300 p-1 rounded shadow-md">
+            
+            <input type="text" 
+                name="export_name" 
+                placeholder="Nome para salvar..." 
+                value="Meus_Gastos.csv" 
+                class="text-xs px-2 py-1 outline-none w-32 border-b border-gray-200 focus:border-purple-500" 
+                required>
+                
+            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-2 py-1 rounded transition-colors">
+                ⬇️ Exportar
+            </button>
+            
+        </form>
+    </div>
+
+    {% if message %}
+    <div class="bg-blue-100 text-blue-800 p-2 text-xs font-bold border-b border-blue-200 w-full">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <div class="flex-1 overflow-auto bg-gray-50 p-2 mt-8">
+        {% if df is not none and not df.empty %}
+        <table class="w-full text-sm text-left text-gray-700 border-collapse border border-gray-300">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border border-gray-300 p-2">Produto</th>
+                    <th class="border border-gray-300 p-2">Valor</th>
+                    <th class="border border-gray-300 p-2">Data</th>
+                    <th class="border border-gray-300 p-2">Categoria</th>
+                    <th class="border border-gray-300 p-2 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in df.iterrows() %}
+                <tr class="hover:bg-gray-100">
+                    <td class="border border-gray-300 p-2">{{ row['Produto'] }}</td>
+                    <td class="border border-gray-300 p-2">R$ {{ "%.2f"|format(row['Valor']) }}</td>
+                    <td class="border border-gray-300 p-2">{{ row['Data'].strftime('%d/%m/%Y') }}</td>
+                    <td class="border border-gray-300 p-2">{{ row['Categoria'] }}</td>
+                    <td class="border border-gray-300 p-2 text-center">
+                        <button hx-post="/delete/{{ index }}" 
+                                hx-target="#workspace" 
+                                hx-confirm="Tem certeza que deseja excluir {{ row['Produto'] }}?"
+                                class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded border border-transparent hover:border-red-300 transition-all">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-gray-400 text-sm p-4 italic">Nenhum dado na planilha. Comece adicionando abaixo.</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-gray-200 border-t border-gray-300 p-2">
+        <form hx-post="/" hx-target="#workspace" class="flex gap-2 text-sm" hx-on::after-request="this.reset()">
+            <input type="text" name="name" placeholder="Produto" required class="flex-1 px-2 py-1 border border-gray-300 rounded shadow-inner">
+            <input type="number" step="0.01" name="amount" placeholder="Valor" required class="w-24 px-2 py-1 border border-gray-300 rounded shadow-inner">
+            <input type="date" name="date" required class="w-36 px-2 py-1 border border-gray-300 rounded shadow-inner">
+            <input type="text" name="category" placeholder="Categoria" required class="w-32 px-2 py-1 border border-gray-300 rounded shadow-inner">
+            
+            <input type="hidden" name="graphType" value="{{ request.form.get('graphType', 'barH') }}">
+            
+            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded shadow">Adicionar Linha</button>
+        </form>
+    </div>
+
+    <div class="bg-gray-200 border-t border-gray-300 p-2">
+         </div>
+</div>
+<div class="w-1/3 bg-white border border-gray-300 shadow flex flex-col items-center justify-center p-4">
+    <h2 class="text-gray-600 font-bold mb-4 text-sm uppercase tracking-wider">Visualização Gráfica</h2>
+    {% if graphBase64 %}
+        <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico" class="max-w-full rounded shadow-sm border border-gray-200">
+    {% else %}
+        <div class="text-gray-400 text-sm italic flex flex-col items-center">
+            <svg class="w-12 h-12 mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            Carregue dados para ver o gráfico
+        </div>
+    {% endif %}
+</div>

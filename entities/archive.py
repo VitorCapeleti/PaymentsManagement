@@ -20,6 +20,11 @@ class Archive:
     def load_csv_file(self, path):
         self.pandasData = pd.read_csv(path)
         self.pandasData['Data'] = pd.to_datetime(self.pandasData['Data'], format='%Y-%m-%d', exact=False)
-    
+        
+    def delete_row(self, rowIdex):
+        if rowIdex in self.pandasData.index:
+            self.pandasData = self.pandasData.drop(index=rowIdex)
+            self.export_csv_file()
+
     def __str__(self):
         return f"Arquivo com o nome: {self.name}, criado!"

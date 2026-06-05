@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
@@ -10,7 +12,7 @@ class Graph:
         
     def plotLineGraph(self, data):
         sns.set_style('whitegrid')
-        plt.figure(figsize=(12,7))
+        plt.figure(figsize=(6,6))
         ax = data.sort_values(ascending = True).plot(kind = "barh", color = "red")
         ax.bar_label(ax.containers[0], padding=3, rotation=45)
         plt.title(self.name, fontsize = 16)
@@ -33,7 +35,7 @@ class Graph:
         plt.close()
         return base64.b64encode(buf.getvalue()).decode('utf-8')
     def plotLinePointGraph(self, data):
-        plt.figure(figsize=(12,7))
+        plt.figure(figsize=(6,6))
         data.plot(kind = 'line', marker = '.', linestyle = '-')
         plt.title(self.name, fontsize = 16)
         plt.xlabel(self.xlabel, fontsize = 12)

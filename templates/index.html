@@ -1,92 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments Management</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <title>Spac-Y - Gerenciador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <style>
+        table th { background-color: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; font-weight: bold; }
+        table td { border: 1px solid #d1d5db; padding: 4px 8px; }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Payments Management</h1>
+<body class="bg-gray-100 h-screen flex flex-col font-sans">
+
+    <header class="bg-purple-700 text-white p-2 shadow-md flex items-center gap-4 text-sm">
+        <h1 class="font-bold text-lg mr-4">📊 Spac-Y</h1>
+        <form hx-post="/" hx-target="#workspace" hx-encoding="multipart/form-data" class="flex gap-2 items-center">
+            <input type="file" name="archive" accept=".csv" class="text-xs bg-white text-black p-1 rounded w-56">
+            <span class="text-sm font-bold">OU</span>
+            <input type="text" name="archiveName" placeholder="Criar novo (ex: dados)..." class="text-black px-2 py-1 rounded border-none w-36 text-xs">
+            <button type="submit" class="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded border border-purple-500 shadow text-xs font-bold">Carregar</button>
+        </form>
+
+        <div class="h-6 w-px bg-purple-500 mx-2"></div> <form hx-post="/" hx-target="#workspace" class="flex gap-2 items-center" id="graphForm">
+             </form>
+        <form hx-post="/" hx-target="#workspace" class="flex gap-2 items-center" id="graphForm">
+            <label>Exibição:</label>
+            <select name="graphType" hx-post="/" hx-target="#workspace" class="text-black px-2 py-1 rounded border-none">
+                <option value="barH">Gráfico de Barras</option>
+                <option value="pie">Pizza</option>
+                <option value="line">Linha</option>
+            </select>
+        </form>
     </header>
-    <main>
-        <div class="container-center">
-            <form action="" method="POST" class="form-container">
-                <div class="form-header">
-                    <div class="form-header-item">
-                        <label for="archive">Deseja carregar um arquivo?</label>
-                        <input type="file" name="archive" id="archive" accept=".csv">
-                    </div>
-                    <div class="form-header-item">
-                        <label for="archiveName">Crie um novo Arquivo: </label>
-                        <input type="text" name="archiveName" id="archiveName" placeholder="Nome do arquivo (.csv)">
-                    </div>
-                        <div class="form-header-item">
-                        <label for="graphType">Selecione o tipo de gráfico: </label>
-                        <select name="graphType" id="graphType">
-                            <option value="barH" selected>BarraH</option>
-                            <option value="pie">Pizza</option>
-                            <option value="line">Linha</option>
-                            <option value="dashboard">Dashboard Completo</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="header-group">
-                    <label for="name">Nome</label>
-                    <label for="amount">Valor</label>
-                    <label for="date">Data</label>
-                    <label for="category">Categoria</label>
-                </div>
-                <div id="container-itens">
-                </div>
-                <div class="form-buttons">
-                    <button type="button" onclick="addInputs()">Adicionar outro item</button>
-                    <button type="submit">Enviar dados</button>
-                </div>
-            </form>
-            <img src="data:image/png;base64,{{ graphBase64 }}" alt="Gráfico Matplotlib" class="matplot-img">
-            <span>{{ message }}</span>
-        </div>
-        
+
+    <main id="workspace" class="flex-1 p-4 flex gap-4 overflow-hidden">
+        {% include 'partials/workspace.html' %}
     </main>
-    <script>
-        function addInputs() {
-            const container = document.getElementById('container-itens');
-            const newInputGroup = document.createElement('div');
-            newInputGroup.id = 'input-group';
-            newInputGroup.innerHTML = `
-                <input type="text" name="name" id="name">
-                <input type="number" step="0.01" name="amount" id="amount">
-                <input type="date" name="date" id="date">
-                <input type="text" name="category" id="category">
-            `;
-            newInputGroup.querySelectorAll('input').forEach(input => input.value = '');
-            container.appendChild(newInputGroup);
-        }
-    </script>
+
 </body>
 </html>
-
-<!-- <table border="1">
-            <thead>
-                <tr>
-                    <th>Payment ID</th>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Category</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for payment in payments %}
-                <tr>
-                    <td>{{ payment.id }}</td>
-                    <td>{{ payment.name }}</td>
-                    <td>{{ payment.amount }}</td>
-                    <td>{{ payment.date }}</td>
-                    <td>{{ payment.category }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>-->
