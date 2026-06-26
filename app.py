@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
-import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
 from entities.archive import Archive
 from operations.graph import Graph
+from operations.pdf import Pdf
 
 app = Flask(__name__)
 app.secret_key = "XXX" 
@@ -105,3 +106,23 @@ def export_file():
         custom_name += '.csv'
         
     return send_file(file_path, as_attachment=True, download_name=custom_name)
+
+@app.route('/export/pdf', methods=['POST'])
+def export_pdf():
+    if 'current_archive' not in session:
+        return redirect(url_for('index'))
+    file_path = session['current_archive']
+    archive = Archive(name = file_path)
+    archive.load_csv_file(file_path)
+    dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
+    graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
+    img1 = graph.plotLineGraph(dataPayment)
+    img2 = graph.plotPieGraph(dataPayment)
+    dataPayment2 = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
+    img3 = graph.plotLinePointGraph(dataPayment2)
+    now = datetime.now()
+    name_pdf = f"Relatorio_{now.strftime('%B_%Y')}.pdf"
+    pdf = Pdf(name_pdf)
+    final_pdf = pdf.createPdf(img1, img2, img3)
+    return send_file(final_pdf, as_attachment=True, download_name=name_pdf, mimetype='application/pdf')
+    
