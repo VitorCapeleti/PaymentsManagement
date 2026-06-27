@@ -25,9 +25,9 @@ class Pdf:
         
         pdf.setFont("Helvetica-Bold", 16)
         pdf.drawString(50, page_height - 50, f"Relatório: {self.name}")
-        pdf.drawImage(img_reader1, 50, page_height - 270, width=500, height=200, preserveAspectRatio=True, mask='auto')
-        pdf.drawImage(img_reader2, 50, page_height - 500, width=500, height=200, preserveAspectRatio=True, mask='auto')
-        pdf.drawImage(img_reader3, 50, page_height - 730, width=500, height=200, preserveAspectRatio=True, mask='auto')
+        pdf.drawImage(img_reader1, 5, page_height - 520, width=280, preserveAspectRatio=True, mask='auto')
+        pdf.drawImage(img_reader2, 320, page_height - 520, width=280, preserveAspectRatio=True, mask='auto')
+        pdf.drawImage(img_reader3, 5, page_height - 820, width=280, preserveAspectRatio=True, mask='auto')
         pdf.showPage()
         pdf.save()
         pdf_buffer.seek(0)
