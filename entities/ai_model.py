@@ -1,5 +1,7 @@
-import ollama
-
+from ollama import Client
+import os
+from dotenv import load_dotenv
+load_dotenv()
 class AiModel:
     def __init__(self, model: str):
         self.model = model
@@ -25,7 +27,7 @@ class AiModel:
             - Data
             - Categoria
 
-            ## Você pode responder perguntas como:
+            ## Responda as seguintes pergunta:
 
             - Quanto gastei neste mês?
             - Quanto gastei hoje?
@@ -69,13 +71,22 @@ class AiModel:
 
             ## Resposta
 
-            Responda de maneira clara, objetiva e organizada. Sempre que fizer sentido, utilize listas, tabelas ou pequenos resumos para facilitar a leitura. """
+            Responda de maneira clara, objetiva e organizada. Sempre que fizer sentido, utilize listas, tabelas ou pequenos resumos para facilitar a leitura.
+            Não utilize markdowns ou símbolos para respoder as perguntas, faça um parágrafo limpo com as respostas, sua resposta será adicionada a um arquivos pdf, que não entende
+            simbologia do markdown, ou seja não use qualquer caracter que não seja compreendido para ser passado a um pdf"""
         try:
-            response = ollama.chat(
-                model = self.model,
-                messages=[{'role': 'user', 'content': prompt}]
+            client = Client(
+                host="https://ollama.com",
+                headers={'Authorization': 'Bearer ' + os.environ.get('OLLAMA_API_KEY')}
             )
-            return response['message']['content']
+            messages=[
+                    {
+                    'role': 'user',
+                    'content': prompt
+                    }
+                ]
+            response = client.chat('gpt-oss:120b', messages=messages, stream=False)
+            return response.message.content
         except Exception as e:
             print(f"Error(Ollama): {e}")
             return "Error: AI server is not working"

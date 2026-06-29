@@ -18,7 +18,7 @@ class Pdf:
     @staticmethod
     def convertText(pdf, x, y, text):
         safe_text = str(text)
-        lines = textwrap.wrap(safe_text, width=50)
+        lines = textwrap.wrap(safe_text, width=92)
         leading = pdf._leading
         for line in lines:
             pdf.drawString(x, y, line)
