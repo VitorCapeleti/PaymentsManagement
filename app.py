@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from entities.archive import Archive
+from entities.ai_model import AiModel
 from operations.graph import Graph
 from operations.pdf import Pdf
 
@@ -114,15 +115,20 @@ def export_pdf():
     file_path = session['current_archive']
     archive = Archive(name = file_path)
     archive.load_csv_file(file_path)
+    
+    ai_chat = AiModel('phi4-mini')
+    report = ai_chat.generate_report(archive.pandasData.to_markdown(index=False))
+    
     dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
     graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
     img1 = graph.plotLineGraph(dataPayment)
     img2 = graph.plotPieGraph(dataPayment)
     dataPayment2 = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
     img3 = graph.plotLinePointGraph(dataPayment2)
+    
     now = datetime.now()
     name_pdf = f"Relatorio_{now.strftime('%B_%Y')}.pdf"
     pdf = Pdf(name_pdf)
-    final_pdf = pdf.createPdf(img1, img2, img3)
+    final_pdf = pdf.createPdf(img1, img2, img3, report)
     return send_file(final_pdf, as_attachment=True, download_name=name_pdf, mimetype='application/pdf')
     
