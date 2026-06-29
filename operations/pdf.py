@@ -1,9 +1,12 @@
 import io
 import base64
-import textwrap
+import re
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph, Frame, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
 class Pdf:
     def __init__(self, name: str):
@@ -15,16 +18,6 @@ class Pdf:
         img_data = base64.b64decode(base64_img)
         return ImageReader(io.BytesIO(img_data))
     
-    @staticmethod
-    def convertText(pdf, x, y, text):
-        safe_text = str(text)
-        lines = textwrap.wrap(safe_text, width=92)
-        leading = pdf._leading
-        for line in lines:
-            pdf.drawString(x, y, line)
-            y -= leading
-        return y
-    
     def createPdf(self, img1, img2, img3, report):
         pdf_buffer = io.BytesIO()
         pdf = canvas.Canvas(pdf_buffer, pagesize=A4)
@@ -32,17 +25,61 @@ class Pdf:
         img_reader1 = self.convertImg(img1)
         img_reader2 = self.convertImg(img2)
         img_reader3 = self.convertImg(img3)
+        pdf.setFillColor(colors.HexColor("#15803d"))
+        pdf.rect(0, page_height - 60, page_width, 60, fill=1, stroke=0)
         
-        pdf.setFont("Helvetica-Bold", 16)
-        pdf.drawString(50, page_height - 50, f"Relatório: {self.name}")
-        pdf.drawImage(img_reader1, 5, page_height - 520, width=280, preserveAspectRatio=True, mask='auto')
-        pdf.drawImage(img_reader2, 320, page_height - 520, width=280, preserveAspectRatio=True, mask='auto')
-        pdf.drawImage(img_reader3, 5, page_height - 820, width=280, preserveAspectRatio=True, mask='auto')
-        pdf.showPage()
-        pdf.setFont("Helvetica-Bold", 16)
-        pdf.drawString(50, page_height - 50, "Relatório Detalhado de Gastos: ")
-        pdf.setFont("Helvetica", 12)
-        self.convertText(pdf, 15, page_height - 80, report)
+        pdf.setFillColor(colors.white)
+        pdf.setFont("Helvetica-Bold", 18)
+        pdf.drawString(30, page_height - 38, f"📊 Dashboard Financeiro: {self.name}")
+        
+        pdf.setFillColor(colors.black)
+        pdf.setStrokeColor(colors.HexColor("#e5e7eb"))
+        
+        pdf.rect(20, page_height - 380, 270, 300)  
+        pdf.rect(305, page_height - 380, 270, 300) 
+        pdf.rect(20, page_height - 700, 555, 300)  
+        
+        pdf.drawImage(img_reader1, 25, page_height - 370, width=260, height=280, preserveAspectRatio=True, mask='auto')
+        pdf.drawImage(img_reader2, 310, page_height - 370, width=260, height=280, preserveAspectRatio=True, mask='auto')
+        pdf.drawImage(img_reader3, 25, page_height - 690, width=545, height=280, preserveAspectRatio=True, mask='auto')
+        
+        pdf.showPage() 
+        clean_text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', report)
+        clean_text = clean_text.replace('### ', '').replace('## ', '').replace('# ', '')
+        styles = getSampleStyleSheet()
+        style = styles["Normal"]
+        style.fontSize = 11
+        style.leading = 16 
+        story = []
+        raw_paragraphs = clean_text.split('\n')
+        
+        for p_text in raw_paragraphs:
+            p_text = p_text.strip()
+            if p_text:
+                story.append(Paragraph(p_text, style))
+                story.append(Spacer(1, 12))
+        margin = 30
+        frame_width = page_width - (2 * margin)
+        frame_height = page_height - 120 
+        max_pages = 50 
+        current_page = 0
+        
+        while len(story) > 0 and current_page < max_pages:
+            current_page += 1
+            
+            pdf.setFillColor(colors.HexColor("#15803d"))
+            pdf.rect(0, page_height - 60, page_width, 60, fill=1, stroke=0)
+            pdf.setFillColor(colors.white)
+            pdf.setFont("Helvetica-Bold", 18)
+            pdf.drawString(30, page_height - 38, "🤖 Relatório Detalhado da IA")
+            pdf.setFillColor(colors.black)
+            
+            f = Frame(margin, margin, frame_width, frame_height, showBoundary=0)
+            f.addFromList(story, pdf)
+            
+            if len(story) > 0:
+                pdf.showPage()
+                
         pdf.save()
         pdf_buffer.seek(0)
         return pdf_buffer

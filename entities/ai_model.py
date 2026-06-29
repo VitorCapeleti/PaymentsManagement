@@ -52,6 +52,9 @@ class AiModel:
             - Sempre que possível, apresente cálculos e resumos organizados.
             - Caso o usuário faça uma pergunta ambígua, solicite esclarecimentos antes de responder.
             - Nunca responda perguntas que não estejam relacionadas aos dados financeiros fornecidos.
+            - IMPORTANTE: NÃO utilize Markdown em sua resposta. 
+            - NUNCA use asteriscos (**), hashtags (#) ou símbolos de formatação.
+            - Gere APENAS texto puro e simples (plain text).
 
             ## Dados do usuário
 
@@ -71,9 +74,7 @@ class AiModel:
 
             ## Resposta
 
-            Responda de maneira clara, objetiva e organizada. Sempre que fizer sentido, utilize listas, tabelas ou pequenos resumos para facilitar a leitura.
-            Não utilize markdowns ou símbolos para respoder as perguntas, faça um parágrafo limpo com as respostas, sua resposta será adicionada a um arquivos pdf, que não entende
-            simbologia do markdown, ou seja não use qualquer caracter que não seja compreendido para ser passado a um pdf"""
+            Responda de maneira clara, objetiva e organizada. Sempre que fizer sentido, utilize listas, tabelas ou pequenos resumos para facilitar a leitura."""
         try:
             client = Client(
                 host="https://ollama.com",
