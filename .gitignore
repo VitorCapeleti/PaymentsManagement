@@ -1,4 +1,6 @@
 __pycache__/
 entities/__pycache__/
 operations/__pycache__/
+.venv/
+.env
 *.csv
