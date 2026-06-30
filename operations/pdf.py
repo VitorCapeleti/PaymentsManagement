@@ -25,12 +25,12 @@ class Pdf:
         img_reader1 = self.convertImg(img1)
         img_reader2 = self.convertImg(img2)
         img_reader3 = self.convertImg(img3)
-        pdf.setFillColor(colors.HexColor("#15803d"))
+        pdf.setFillColor(colors.HexColor("#671580"))
         pdf.rect(0, page_height - 60, page_width, 60, fill=1, stroke=0)
         
         pdf.setFillColor(colors.white)
         pdf.setFont("Helvetica-Bold", 18)
-        pdf.drawString(30, page_height - 38, f"📊 Dashboard Financeiro: {self.name}")
+        pdf.drawString(30, page_height - 38, f"Dashboard Financeiro: {self.name}")
         
         pdf.setFillColor(colors.black)
         pdf.setStrokeColor(colors.HexColor("#e5e7eb"))
@@ -67,11 +67,11 @@ class Pdf:
         while len(story) > 0 and current_page < max_pages:
             current_page += 1
             
-            pdf.setFillColor(colors.HexColor("#15803d"))
+            pdf.setFillColor(colors.HexColor("#671580"))
             pdf.rect(0, page_height - 60, page_width, 60, fill=1, stroke=0)
             pdf.setFillColor(colors.white)
             pdf.setFont("Helvetica-Bold", 18)
-            pdf.drawString(30, page_height - 38, "🤖 Relatório Detalhado da IA")
+            pdf.drawString(30, page_height - 38, "Relatório Detalhado da IA")
             pdf.setFillColor(colors.black)
             
             f = Frame(margin, margin, frame_width, frame_height, showBoundary=0)

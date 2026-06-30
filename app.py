@@ -1,13 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from entities.archive import Archive
 from entities.ai_model import AiModel
 from operations.graph import Graph
 from operations.pdf import Pdf
 
 app = Flask(__name__)
-app.secret_key = "XXX" 
+app.secret_key = os.environ.get('APP_FLASK_SECRET_KEY')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
