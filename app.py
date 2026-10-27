@@ -12,6 +12,24 @@ from operations.pdf import Pdf
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_FLASK_SECRET_KEY')
 
+def build_graph(df, graphType):
+    """Builds the base64 graph for the current dataframe, or None when there is no data"""
+    if df is None or df.empty:
+        return None
+    graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
+    if graphType == 'pie':
+        return graph.plotPieGraph(df.groupby("Categoria")["Valor"].sum())
+    if graphType == 'line':
+        return graph.plotLinePointGraph(df.set_index('Data').resample('D')["Valor"].sum())
+    return graph.plotLineGraph(df.groupby("Categoria")["Valor"].sum())
+
+def income_summary(df):
+    """Income informed in the session minus the sum of the spending in the table"""
+    income = session.get('income')
+    total_spent = float(df['Valor'].sum()) if df is not None and not df.empty else 0.0
+    balance = income - total_spent if income is not None else None
+    return {'income': income, 'total_spent': total_spent, 'balance': balance}
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     message = ""
@@ -26,16 +44,18 @@ def index():
             filename = secure_filename(uploaded_file.filename)
             uploaded_file.save(filename)
             session['current_archive'] = filename
+            session.pop('income', None)
             message = f"Arquivo '{filename}' carregado com sucesso!"
             
         elif new_archive_name:
             filename = new_archive_name if new_archive_name.endswith('.csv') else f"{new_archive_name}.csv"
             session['current_archive'] = filename
+            session.pop('income', None)
             message = f"Nova área de trabalho '{filename}' criada."
 
         if 'current_archive' not in session:
             message = "Por favor, envie um arquivo CSV ou crie um novo."
-            return render_template('index.html', message=message, df=current_df, graphBase64=graphBase64)
+            return render_template('index.html', message=message, df=current_df, graphBase64=graphBase64, summary=income_summary(current_df))
 
         archive = Archive(name=session['current_archive'])
         try:
@@ -57,24 +77,12 @@ def index():
             current_df = archive.pandasData
             message = "Novo item salvo com sucesso!"
             
-        if current_df is not None and not current_df.empty:
-            graphType = request.form.get('graphType', 'barH')
-            graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
-            
-            if graphType == 'barH':
-                dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-                graphBase64 = graph.plotLineGraph(dataPayment)
-            elif graphType == 'pie':
-                dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-                graphBase64 = graph.plotPieGraph(dataPayment)
-            elif graphType == 'line':
-                dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
-                graphBase64 = graph.plotLinePointGraph(dataPayment)
+        graphBase64 = build_graph(current_df, request.form.get('graphType', 'barH'))
 
         if 'HX-Request' in request.headers:
-            return render_template('partials/workspace.html', message=message, df=current_df, graphBase64=graphBase64)
+            return render_template('partials/workspace.html', message=message, df=current_df, graphBase64=graphBase64, summary=income_summary(current_df))
 
-    return render_template('index.html', message=message, df=current_df, graphBase64=graphBase64)
+    return render_template('index.html', message=message, df=current_df, graphBase64=graphBase64, summary=income_summary(current_df))
 
 @app.route('/delete/<int:row_index>', methods=['POST'])
 def delete_row(row_index):
@@ -87,17 +95,29 @@ def delete_row(row_index):
     archive.delete_row(row_index)
     message = "Item removido com sucesso!"
     
-    graphType = request.form.get('graphType', 'barH')
-    graph = Graph("Gastos Mensais", "Valor gasto", "Categoria")
-    dataPayment = archive.pandasData.groupby("Categoria")["Valor"].sum()
-    if graphType == 'barH':
-        graphBase64 = graph.plotLineGraph(dataPayment)
-    elif graphType == 'pie':
-        graphBase64 = graph.plotPieGraph(dataPayment)
-    elif graphType == 'line':
-        dataPayment = archive.pandasData.set_index('Data').resample('D')["Valor"].sum()
-        graphBase64 = graph.plotLinePointGraph(dataPayment)
-    return render_template('partials/workspace.html', message=message, df=archive.pandasData, graphBase64=graphBase64)
+    graphBase64 = build_graph(archive.pandasData, request.form.get('graphType', 'barH'))
+    return render_template('partials/workspace.html', message=message, df=archive.pandasData, graphBase64=graphBase64, summary=income_summary(archive.pandasData))
+
+@app.route('/income', methods=['POST'])
+def set_income():
+    """Saves the income informed by the user for the current session and recalculates the balance"""
+    if 'current_archive' not in session:
+        return "Erro de sessão", 400
+
+    try:
+        session['income'] = float(request.form.get('income', '').replace(',', '.'))
+        message = "Renda atualizada com sucesso!"
+    except ValueError:
+        message = "Informe um valor de renda válido."
+
+    archive = Archive(name=session['current_archive'])
+    try:
+        archive.load_csv_file(session['current_archive'])
+    except FileNotFoundError:
+        pass
+
+    graphBase64 = build_graph(archive.pandasData, request.form.get('graphType', 'barH'))
+    return render_template('partials/workspace.html', message=message, df=archive.pandasData, graphBase64=graphBase64, summary=income_summary(archive.pandasData))
 
 @app.route('/export',  methods=['POST'])
 def export_file():

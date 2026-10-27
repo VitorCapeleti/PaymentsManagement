@@ -5,5 +5,4 @@ flask
 reportlab
 tabulate
 ollama
-os
 python-dotenv
